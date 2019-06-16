@@ -1,19 +1,14 @@
 package fr.ec.producthunt.data.model;
 
 import android.content.ContentValues;
-import androidx.room.Entity;
-import androidx.room.PrimaryKey;
 import fr.ec.producthunt.data.database.DataBaseContract;
 
-@Entity(tableName = "posts")
 public class Post {
-
-  @PrimaryKey
-  private long id;
   private String title;
   private String subTitle;
   private String imageUrl;
   private String postUrl;
+  private long id;
 
   public String getTitle() {
     return title;

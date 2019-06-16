@@ -3,7 +3,7 @@ package fr.ec.producthunt.data;
 import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import static android.content.ContentValues.TAG;

@@ -2,6 +2,4 @@
   <string name="app_name">ProductHunt</string>
   <string name="menu_refresh_title">Actualiser</string>
   <string name="emplty_list_msg">Veuillez actualiser</string>
-  <string name="navigation_drawer_close">close</string>
-  <string name="navigation_drawer_open">open</string>
 </resources>

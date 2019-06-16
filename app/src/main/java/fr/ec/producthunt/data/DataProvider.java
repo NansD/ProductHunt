@@ -1,13 +1,16 @@
 package fr.ec.producthunt.data;
 
 import android.app.Application;
-import android.content.Context;
 import android.util.Log;
-import fr.ec.producthunt.data.database.RoomProductHuntDb;
-import fr.ec.producthunt.data.database.dao.PostDao;
+import fr.ec.producthunt.data.database.PostDao;
+import fr.ec.producthunt.data.database.ProductHuntDbHelper;
 import fr.ec.producthunt.data.model.Post;
-import fr.ec.producthunt.data.repository.post.remote.PostRemoteRepository;
-import fr.ec.producthunt.data.repository.post.remote.PostRemoteRepositoryException;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.List;
 
 import static android.content.ContentValues.TAG;
@@ -20,39 +23,92 @@ public class DataProvider {
   private JsonPostParser jsonPostParser = new JsonPostParser();
 
   private final PostDao postDao;
-  private final PostRemoteRepository postRemoteRepository;
 
   private static DataProvider dataProvider;
 
   public static DataProvider getInstance(Application application) {
 
     if (dataProvider == null) {
-      dataProvider = new DataProvider(application);
+      dataProvider = new DataProvider(ProductHuntDbHelper.getInstance(application));
     }
     return dataProvider;
   }
 
-  public DataProvider(Context context) {
-    postDao = RoomProductHuntDb.getDatabase(context).postDeo();
-    postRemoteRepository = new PostRemoteRepository();
+  public DataProvider(ProductHuntDbHelper dbHelper) {
+    postDao = new PostDao(dbHelper);
+  }
+
+  private String getPostsFromWeb(String apiUrl) {
+
+    HttpURLConnection urlConnection = null;
+    BufferedReader reader = null;
+
+    // Contiendra la réponse JSON brute sous forme de String .
+    String posts = null;
+
+    try {
+      // Construire l' URL de l'API ProductHunt
+      URL url = new URL(apiUrl);
+
+      // Creer de la requête http vers  l'API ProductHunt , et ouvrir la connexion
+      urlConnection = (HttpURLConnection) url.openConnection();
+      urlConnection.setRequestMethod("GET");
+      urlConnection.connect();
+
+      // Lire le  input stream et le convertir String
+      InputStream inputStream = urlConnection.getInputStream();
+      StringBuffer buffer = new StringBuffer();
+      if (inputStream == null) {
+        // Nothing to do.
+        return null;
+      }
+      reader = new BufferedReader(new InputStreamReader(inputStream));
+
+      String line;
+      while ((line = reader.readLine()) != null) {
+        buffer.append(line + "\n");
+      }
+
+      if (buffer.length() == 0) {
+        // Si le stream est vide, on revoie null;
+        return null;
+      }
+      posts = buffer.toString();
+    } catch (IOException e) {
+      Log.e(TAG, "Error ", e);
+      return null;
+    } finally {
+      if (urlConnection != null) {
+        urlConnection.disconnect();
+      }
+      if (reader != null) {
+        try {
+          reader.close();
+        } catch (final IOException e) {
+          Log.e(TAG, "Error closing stream", e);
+        }
+      }
+    }
+
+    return posts;
   }
 
   public List<Post> getPostsFromDatabase() {
-    return postDao.getPosts();
+    return postDao.retrievePosts();
   }
+
 
   public Boolean syncPost() {
 
+    List<Post> list = jsonPostParser.jsonToPosts(getPostsFromWeb(POST_API_END_POINT));
+
+
     int nb = 0;
 
-    try {
-      List<Post> postList = postRemoteRepository.getPosts();
-      postDao.save(postList);
-      nb = postList.size();
-    } catch (PostRemoteRepositoryException e) {
-      Log.e(TAG, "syncPost: Fails", e);
+    for (Post post : list) {
+      postDao.save(post);
+      nb++;
     }
-
     return nb > 0;
   }
 }

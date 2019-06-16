@@ -6,9 +6,9 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -22,6 +22,7 @@ import fr.ec.producthunt.R;
 import fr.ec.producthunt.data.DataProvider;
 import fr.ec.producthunt.data.SyncService;
 import fr.ec.producthunt.data.model.Post;
+import fr.ec.producthunt.ui.detail.DetailActivity;
 import java.util.List;
 
 public class PostsFragments extends Fragment {
