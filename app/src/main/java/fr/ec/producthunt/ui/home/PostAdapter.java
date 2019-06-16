@@ -1,5 +1,6 @@
 package fr.ec.producthunt.ui.home;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,8 @@ import fr.ec.producthunt.R;
 import fr.ec.producthunt.data.model.Post;
 import java.util.Collections;
 import java.util.List;
+
+import static android.content.ContentValues.TAG;
 
 public class PostAdapter extends BaseAdapter {
 
@@ -35,32 +38,73 @@ public class PostAdapter extends BaseAdapter {
 
     ViewHolder viewHolder;
 
-    if (convertView == null) {
-      convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item, parent, false);
+    boolean isBigView = getViewType(position);
 
-      viewHolder = new ViewHolder();
-      viewHolder.title = convertView.findViewById(R.id.title);
-      viewHolder.subTitle = convertView.findViewById(R.id.sub_title);
-      viewHolder.postImage = convertView.findViewById(R.id.img_product);
+    if(!isBigView) {
+      if (convertView == null) {
+        convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item, parent, false);
 
-      convertView.setTag(viewHolder);
+        viewHolder = new ViewHolder();
+        viewHolder.title = convertView.findViewById(R.id.title);
+        viewHolder.subTitle = convertView.findViewById(R.id.sub_title);
+        viewHolder.postImage = convertView.findViewById(R.id.img_product);
+        viewHolder.commentsNumber = convertView.findViewById(R.id.comments_counter);
+
+
+        convertView.setTag(viewHolder);
+      } else {
+
+        viewHolder = (ViewHolder) convertView.getTag();
+      }
+
+      Post post = dataSource.get(position);
+      viewHolder.title.setText(post.getTitle());
+      viewHolder.subTitle.setText(post.getSubTitle());
+      Log.d(TAG, "getView: "+ post.getCommentNumber());
+      viewHolder.commentsNumber.setText(post.getCommentNumber() + " comments");
+
+
+      Picasso.with(parent.getContext())
+              .load(post.getImageUrl())
+              .centerCrop()
+              .fit()
+              .into(viewHolder.postImage);
     } else {
+      if (convertView == null) {
+        convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.main_item, parent, false);
 
-      viewHolder = (ViewHolder) convertView.getTag();
+        viewHolder = new ViewHolder();
+        viewHolder.title = convertView.findViewById(R.id.title);
+        viewHolder.subTitle = convertView.findViewById(R.id.sub_title);
+        viewHolder.postImage = convertView.findViewById(R.id.img_product);
+        viewHolder.commentsNumber = convertView.findViewById(R.id.comments_counter);
+
+        convertView.setTag(viewHolder);
+      } else {
+
+        viewHolder = (ViewHolder) convertView.getTag();
+      }
+
+      Post post = dataSource.get(position);
+      viewHolder.title.setText(post.getTitle());
+      viewHolder.subTitle.setText(post.getSubTitle());
+      viewHolder.commentsNumber.setText(post.getCommentNumber() + " comments");
+
+
+      Picasso.with(parent.getContext())
+              .load(post.getImageUrl())
+              .centerCrop()
+              .fit()
+              .into(viewHolder.postImage);
     }
 
-    Post post = dataSource.get(position);
-    viewHolder.title.setText(post.getTitle());
-    viewHolder.subTitle.setText(post.getSubTitle());
 
-
-    Picasso.with(parent.getContext())
-        .load(post.getImageUrl())
-        .centerCrop()
-        .fit()
-        .into(viewHolder.postImage);
 
     return convertView;
+  }
+
+  private boolean getViewType(int itemPosition) {
+    return itemPosition == 0;
   }
 
   public void showPosts(List<Post> posts) {
@@ -72,6 +116,7 @@ public class PostAdapter extends BaseAdapter {
   private static class ViewHolder {
     TextView title;
     TextView subTitle;
+    TextView commentsNumber;
     ImageView postImage;
   }
 }
