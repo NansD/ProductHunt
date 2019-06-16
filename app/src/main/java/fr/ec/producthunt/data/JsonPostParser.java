@@ -1,5 +1,7 @@
 package fr.ec.producthunt.data;
 
+import android.util.Log;
+
 import fr.ec.producthunt.data.model.Post;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -7,6 +9,8 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import static android.content.ContentValues.TAG;
 
 /**
  * @author Mohammed Boukadir  @:mohammed.boukadir@gmail.com
@@ -45,10 +49,12 @@ public class JsonPostParser {
     //      "image_url": "https://ph-files.imgix.net/b27175ba-ff99-4099-9092-1e8e8fb1cc77?auto=format&w=430&h=570&fit=max",
     //      "metadata": {}
     //},
+    Log.d(TAG, "jsonToPost: " + postJson);
     post.setId(postJson.getInt("id"));
     post.setTitle(postJson.getString("name"));
     post.setSubTitle(postJson.getString("tagline"));
     post.setPostUrl(postJson.getString("redirect_url"));
+    post.setCommentNumber(postJson.getString("comments_count"));
 
     post.setImageUrl(postJson.getJSONObject("thumbnail").getString("image_url"));
 
@@ -56,3 +62,5 @@ public class JsonPostParser {
     return post;
   }
 }
+
+

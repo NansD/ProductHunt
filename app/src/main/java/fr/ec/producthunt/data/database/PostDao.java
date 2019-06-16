@@ -1,9 +1,13 @@
 package fr.ec.producthunt.data.database;
 
 import android.database.Cursor;
+import android.util.Log;
+
 import fr.ec.producthunt.data.model.Post;
 import java.util.ArrayList;
 import java.util.List;
+
+import static android.content.ContentValues.TAG;
 
 /**
  * @author Mohammed Boukadir  @:mohammed.boukadir@gmail.com
@@ -41,6 +45,7 @@ public class PostDao {
         post.setSubTitle(cursor.getString(2));
         post.setImageUrl(cursor.getString(3));
         post.setPostUrl(cursor.getString(4));
+        post.setCommentNumber(cursor.getString(5));
 
         posts.add(post);
 
